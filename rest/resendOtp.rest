@@ -1,0 +1,6 @@
+POST http://localhost:4000/auth/resend-otp
+Content-Type: application/json
+
+{
+    "userId":"userid-123489okspo2euie"
+}

@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  firstName        String?
+  lastName         String?
+  middleName       String?
+  passwordHash     String
+  accounts         Account[]
+  isActive         Boolean   @default(false)
+  phoneNumber      String?
+  otpHash          String? //stores the hashed OTP for verification
+  otpExpiresAt     DateTime? //stores the expiration time of the OTP
+  firebaseToken    String?
+  lastLogin        DateTime?
+  lastLogout       DateTime?
+  lastLoginAttempt DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Account {
+  id                   String        @id @default(uuid())
+  userId               String?
+  accountNumber        String        @unique
+  balance              Decimal       @default(0.00) @db.Decimal(10, 2)
+  User                 User?         @relation(fields: [userId], references: [id])
+  sentTransactions     Transaction[] @relation("SourceAccountTransactions")
+  receivedTransactions Transaction[] @relation("DestinationAccountTransactions")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model Transaction {
+  id                   String   @id @default(uuid())
+  sourceAccountId      String
+  destinationAccountId String
+  amount               Decimal  @db.Decimal(10, 2)
+  reference            String?  @default("INTERBANK_TRANSFER")
+  status               String   @default("PENDING")
+  date                 DateTime @default(now())
+
+  sourceAccount      Account @relation("SourceAccountTransactions", fields: [sourceAccountId], references: [id])
+  destinationAccount Account @relation("DestinationAccountTransactions", fields: [destinationAccountId], references: [id])
+
+  @@index([sourceAccountId])
+  @@index([destinationAccountId])
+}
