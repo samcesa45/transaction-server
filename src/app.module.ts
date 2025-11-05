@@ -11,6 +11,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
 import { RedisService } from './redis/redis.service';
+import { TransactionsService } from './transactions/transactions.service';
+import { TransactionsController } from './transactions/transactions.controller';
+import { TransactionsModule } from './transactions/transactions.module';
 import mailConfig from './config/mail.config';
 import databaseConfig from './config/database.config';
 
@@ -24,9 +27,10 @@ import databaseConfig from './config/database.config';
     // TwiloModule,
     UsersModule,
     PrismaModule,
-    MailModule
+    MailModule,
+    TransactionsModule
   ],
-  controllers: [AppController],
-  providers: [AppService, MailService, RedisService],
+  controllers: [AppController, TransactionsController],
+  providers: [AppService, MailService, RedisService, TransactionsService],
 })
 export class AppModule {}

@@ -1,10 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from './users.service';
-
-interface RequestWithUser extends Request {
-    user: {userId:string; email:string}
-}
+import type { RequestWithUser } from 'src/common';
 
 @Controller('users')
 export class UsersController {
