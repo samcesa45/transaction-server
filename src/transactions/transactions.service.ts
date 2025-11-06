@@ -1,7 +1,8 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TransactionsDto } from './dto/transactionsdto';
-import { Decimal } from 'generated/prisma/runtime/library';
+import { Decimal } from '@prisma/client/runtime/client';
+
 
 @Injectable()
 export class TransactionsService {

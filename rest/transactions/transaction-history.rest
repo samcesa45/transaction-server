@@ -1,0 +1,3 @@
+get http://localhost:4000/transactions?accountId=""
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDgxMGI3MC0zOTE2LTQxNjItYmU0MS0wZWZjYmU5MWZkZDAiLCJpYXQiOjE3NjIzMTAzNTksImV4cCI6MTc2MjMxMTI1OX0.yJvy7Cx7EeIyoJibAzH5pw870StXUd6zZvGjyeRme1Y
