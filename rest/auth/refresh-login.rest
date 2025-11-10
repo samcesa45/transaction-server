@@ -1,8 +1,0 @@
-POST http://localhost:4000/auth/refresh
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDgxMGI3MC0zOTE2LTQxNjItYmU0MS0wZWZjYmU5MWZkZDAiLCJpYXQiOjE3NjIwMTIwNTIsImV4cCI6MTc2MjAxMjk1Mn0.xl8VTj92JzCsc3SQDzFf5J-fwcG15Ar_WLaA9OilLxQ
-
-{
- 
-  "refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDgxMGI3MC0zOTE2LTQxNjItYmU0MS0wZWZjYmU5MWZkZDAiLCJpYXQiOjE3NjIwMTIwNTIsImV4cCI6MTc2MjAxMjk1Mn0.xl8VTj92JzCsc3SQDzFf5J-fwcG15Ar_WLaA9OilLxQ",
-}

@@ -7,40 +7,151 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AccountType {
+  savings
+  current
+  fixed_deposit
+}
+
+enum OtpPurpose {
+  email_verification
+  phone_verification
+  password_reset
+  transaction
+}
+
+enum actionType {
+  login
+  logout
+  logout_all
+  account_locked
+  password_change
+  biometric_login 
+  transaction
+}
+
+enum statusType {
+  success
+  failed
+  suspicious
+}
+
 model User {
-  id               String    @id @default(uuid())
-  email            String    @unique
-  passwordHash     String
-  phoneNumber      String?
-  otpHash          String?
-  otpExpiresAt     DateTime?
-  firebaseToken    String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  isActive         Boolean   @default(false)
-  lastLoginAttempt DateTime?
-  lastLogout       DateTime?
-  lastLogin        DateTime?
-  firstName        String?
-  lastName         String?
-  middleName       String?
-  accounts         Account[]
+  id                  String        @id @default(uuid())
+  email               String        @unique
+  passwordHash        String
+  phoneNumber         String?       @unique
+  transactionPin      String?
+  biometricEnabled    Boolean       @default(false)
+  biometricPublicKey  String?
+  firstName           String
+  lastName            String
+  middleName          String?
+  dateOfBirth         DateTime //added for kyc
+  bvn                 String?       @unique // added for Nigerian banking (Bank Verification Number)
+  isActive            Boolean       @default(false)
+  isLocked            Boolean       @default(false)
+  failedLoginAttempts Int           @default(0)
+  lastFailedLogin     DateTime?
+  lastLogin           DateTime?
+  emailVerified       Boolean       @default(false)
+  phoneVerified       Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  accounts            Account[]
+  devices             Device[]
+  sessions            Session[]
+  securityLogs        SecurityLog[]
+
+  @@index([email])
+  @@index([phoneNumber])
+}
+
+model Device {
+  id               String   @id @default(uuid())
+  userId           String
+  deviceId         String   @unique
+  deviceName       String
+  deviceType       String
+  fcmToken         String?
+  biometricEnabled Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  lastUsed         DateTime @default(now())
+  createdAt        DateTime @default(now())
+  User             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deviceId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  deviceId     String
+  refreshToken String   @unique
+  accessToken  String?
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  lastActivity DateTime @default(now())
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@index([deviceId])
+  @@index([expiresAt])
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  userId    String
+  otpHash   String
+  purpose   OtpPurpose
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+model SecurityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    actionType
+  status    statusType
+  metadata  Json? //store additional context
+  ipAddress String?
+  deviceId  String?
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([action, status])
 }
 
 model Account {
   id                   String        @id @default(uuid())
-  userId               String?
+  userId               String
   accountNumber        String        @unique
   balance              Decimal       @default(0.00) @db.Decimal(10, 2)
-  currency             String?       @default("NGN")
-  accountType          String?       @default("savings")
+  currency             String        @default("NGN")
+  accountType          AccountType   @default(savings)
+  isPrimary            Boolean       @default(false) // Mark default account for transfers
+  isActive             Boolean       @default(true)
+  dailyLimit           Decimal?      @db.Decimal(10, 2)
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
-  User                 User?         @relation(fields: [userId], references: [id])
+  User                 User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   receivedTransactions Transaction[] @relation("DestinationAccountTransactions")
   sentTransactions     Transaction[] @relation("SourceAccountTransactions")
 
   @@index([userId])
+  @@index([accountNumber])
+  @@index([userId, isPrimary])
 }
 
 model Transaction {
@@ -49,11 +160,21 @@ model Transaction {
   destinationAccountId String
   amount               Decimal  @db.Decimal(10, 2)
   reference            String?  @default("INTERBANK_TRANSFER")
-  status               String   @default("PENDING")
-  date                 DateTime @default(now())
-  destinationAccount   Account  @relation("DestinationAccountTransactions", fields: [destinationAccountId], references: [id])
-  sourceAccount        Account  @relation("SourceAccountTransactions", fields: [sourceAccountId], references: [id])
+  narration            String?
+  transactionType      String   @default("transfer")
+  status               String   @default("pending")
+  failureReason        String?
+  balanceBefore        Decimal? @db.Decimal(10, 2)
+  balanceAfter         Decimal? @db.Decimal(10, 2)
+
+  destinationAccount Account   @relation("DestinationAccountTransactions", fields: [destinationAccountId], references: [id], onDelete: Restrict)
+  sourceAccount      Account   @relation("SourceAccountTransactions", fields: [sourceAccountId], references: [id], onDelete: Restrict)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? @updatedAt
 
   @@index([sourceAccountId])
   @@index([destinationAccountId])
+  @@index([sourceAccountId, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
 }

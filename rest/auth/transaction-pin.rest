@@ -1,0 +1,8 @@
+POST http://localhost:4000/auth/set-transaction-pin
+Content-Type: application/json
+Authorization: Bearer YOUR_ACCESS_TOKEN_HERE
+
+{
+    "transactionPin":"1234",
+    "confirmPin":"1234"
+}

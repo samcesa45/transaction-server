@@ -1,0 +1,3 @@
+get http://localhost:4000/account/get-profile
+Content-Type: application/application/json
+Authorization: Bearer YOUR_ACCESS_TOKEN

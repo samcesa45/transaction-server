@@ -1,27 +1,29 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator";
+import {
+  IsDecimal,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class TransactionsDto {
-    @IsString()
-    @IsNotEmpty()
-    @IsUUID()
-    sourceAccountId:string;
+  @IsString()
+  @IsNotEmpty()
+  destinationAccountNumber: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsUUID()
-    destinationAccountId:string;
+  @IsDecimal()
+  @IsNotEmpty()
+  amount: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    amount:number;
+  @IsString()
+  @IsOptional()
+  narration?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    status:string;
+  @IsString()
+  @IsOptional()
+  reference?: string;
 
-    @IsString()
-    reference:string;
-
-    @IsDate()
-    date:string
+  @IsString()
+  @IsOptional()
+  sourceAccountNumber?: string;
 }

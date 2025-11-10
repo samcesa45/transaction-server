@@ -14,6 +14,16 @@ import { RedisService } from './redis/redis.service';
 import { TransactionsService } from './transactions/transactions.service';
 import { TransactionsController } from './transactions/transactions.controller';
 import { TransactionsModule } from './transactions/transactions.module';
+import { BiometricService } from './biometric/biometric.service';
+import { BiometricController } from './biometric/biometric.controller';
+import { BiometricModule } from './biometric/biometric.module';
+import { NotificationService } from './notification/notification.service';
+import { FirebaseModule } from './firebase/firebase.module';
+import { FirebaseService } from './firebase/firebase.service';
+import { BankingGateway } from './bankinggateway/bankinggateway.gateway';
+import { NotificationController } from './notification/notification.controller';
+import { BankinggatewayController } from './bankinggateway/bankinggateway.controller';
+import { BankinggatewayModule } from './bankinggateway/bankinggateway.module';
 import mailConfig from './config/mail.config';
 import databaseConfig from './config/database.config';
 
@@ -21,16 +31,28 @@ import databaseConfig from './config/database.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load:[databaseConfig,twiloConfig,mailConfig]
+      load: [databaseConfig, twiloConfig, mailConfig],
     }),
     AuthModule,
     // TwiloModule,
     UsersModule,
     PrismaModule,
     MailModule,
-    TransactionsModule
+    TransactionsModule,
+    BiometricModule,
+    FirebaseModule,
+    BankinggatewayModule,
   ],
-  controllers: [AppController, TransactionsController],
-  providers: [AppService, MailService, RedisService, TransactionsService],
+  controllers: [AppController, TransactionsController, BiometricController, NotificationController, BankinggatewayController],
+  providers: [
+    AppService,
+    MailService,
+    RedisService,
+    TransactionsService,
+    BiometricService,
+    NotificationService,
+    BankingGateway,
+    FirebaseService,
+  ],
 })
 export class AppModule {}
